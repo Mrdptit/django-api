@@ -14,32 +14,39 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     def creat_user(self,request):
-        print(request.data)
-        logging.debug(request.data)
-        email = request.data['email']
-        password = request.data['password']
-        username = request.data['username']
-        first_name = request.data['first_name']
-        last_name = request.data['last_name']
-        try:
-            check_mail = User.objects.get(email = email)
-            if check_mail:
-                return Response({'status': status.HTTP_302_FOUND, 'msg': 'Email not exist'})
-            pass
-        except:
-            user = User.objects.create_user(email = email, password = password)
-            user.username = username
-            user.first_name = first_name
-            user.last_name  = last_name
-            user.save()
-            return Response({'status': status.HTTP_201_CREATED,'msg':'create success','data':UserSerializer(user).data})
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # print(request.data)
+        # logging.debug(request.data)
+        # email = request.data['email']
+        # password = request.data['password']
+        # username = request.data['username']
+        # first_name = request.data['first_name']
+        # last_name = request.data['last_name']
+        # try:
+        #     check_mail = User.objects.get(email = email)
+        #     if check_mail:
+        #         return Response({'status': status.HTTP_302_FOUND, 'msg': 'Email not exist'})
+        #     pass
+        # except:
+        #     user = User.objects.create_user(email = email, password = password)
+        #     user.username = username
+        #     user.first_name = first_name
+        #     user.last_name  = last_name
+        #     user.save()
+        #     return Response({'status': status.HTTP_201_CREATED,'msg':'create success','data':UserSerializer(user).data})
     def update_user_info(self,request):
+        self.serializer_class(data=request.data)
         try:
-            id = request.PUT.get('id')
-            print(id)
-            user = User.objects.values_list().filter(id = id)
+            print(request.data)
+            id = request.data['id']
+            user = queryset.filter(id = id)
             print(user)
-            username = request.PUT.get('username')
+            return self.update(request,user)
+            username = request.data('username')
             first_name = request.PUT.get('first_name')
             last_name   = request.PUT.get('last_name')
             facebook_id = request.PUT.get('facebook_id')

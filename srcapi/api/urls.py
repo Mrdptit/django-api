@@ -4,6 +4,7 @@ from rest_framework.authtoken import views
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import renderers
 from .views import *
+# from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 user_list = UserViewSet.as_view({
     'post': 'creat_user'
@@ -25,9 +26,10 @@ chat_value = ChatViewSet.as_view({
 urlpatterns = [
     url(r'^learn$', chat),
     re_path(r'^chat/(?P<key>\w{1,50})/$', chat_value),
-    re_path(r'^user/signin$', user_list),
+    re_path(r'^user/register$', user_list),
     re_path(r'^user/token-auth/$', views.obtain_auth_token),
     path('user/update',user_detail),
+    # path('user/verify')
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

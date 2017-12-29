@@ -6,6 +6,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+import string
+import random
 # Create your models here.
 DEFAULT_COVER = 'https://www.google.com.vn/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwinz97z6KvYAhUfSI8KHVL7CsgQjRwIBw&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DQX4j_zHAlw8&psig=AOvVaw2alZ9a3n7ICEn89KdwdkAk&ust=1514520024404108'
 DEFAULT_AVATAR = 'https://www.google.com.vn/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwjXmYPb6KvYAhXLto8KHVlVDC8QjRwIBw&url=http%3A%2F%2Fwww.yxineff.com%2Fen%2Ffilmmakers%2Fnguyen-thuy-tien%2F&psig=AOvVaw010B5-zNbkVHktKfy_JPy0&ust=1514519967983392'
@@ -13,36 +15,48 @@ DEFAULT_AVATAR = 'https://www.google.com.vn/url?sa=i&rct=j&q=&esrc=s&source=imag
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+def random_generator(size=6, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for x in range(size))
 class UserManager(BaseUserManager):
-    def create_user(self,email,password = None):
+    def create_user(self, email, password=None, **kwargs):
         if not email:
-            raise ValueError('Users must have email address')
+            raise ValueError('Users must have a valid e-mail address')
+
+        # Ensure that a username is set
+        if not kwargs.get('username'):
+            raise ValueError('Users must have a valid username')
+
         user = self.model(
-            email = self.normalize_email(email),
+            email=self.normalize_email(email),
+            username=kwargs.get('username'),
+            first_name=kwargs.get('first_name', None),
+            last_name=kwargs.get('last_name', None),
         )
+
         user.set_password(password)
         user.save(using = self.db)
-        user.token = Token.objects.get_or_create(user=user).key
+        user.token = Token.objects.get_or_create(user=user)[0].key
+        user.verify_key = random_generator()
         return user
-    def create_staffuser(self, email, password):
+    def create_staffuser(self, email, password=None, **kwargs):
 
         user = self.create_user(
             email,
             password = password,
+            kwargs = kwargs,
         )
         user.staff = True
         user.save(using = self.db)
-        user.token = Token.objects.get_or_create(user=user).key
         return user
-    def create_superuser(self,email,password):
+    def create_superuser(self, email, password=None, **kwargs):
 
         user = self.create_user(
             email,
             password = password,
+            kwargs = kwargs,
         )
         user.staff = True
         user.admin = True
-        user.token = Token.objects.get_or_create(user=user).key
         return user
 class  User(AbstractBaseUser,PermissionsMixin):
     email = models.EmailField(
@@ -50,7 +64,7 @@ class  User(AbstractBaseUser,PermissionsMixin):
         max_length = 255,
         unique = True,
     )
-    username = models.CharField(max_length = 255,default= '',unique= True)
+    username = models.CharField(max_length = 255,default = email)
     last_name = models.CharField(max_length = 255,default= '')
     first_name = models.CharField(max_length = 255,default= '')
     token = models.CharField(max_length = 255,default= '')
@@ -62,8 +76,10 @@ class  User(AbstractBaseUser,PermissionsMixin):
     admin = models.BooleanField(default = False)
     is_superuser= models.BooleanField(default= False)
     create_date = models.DateTimeField(auto_now_add=True)
+    verifyUser = models.BooleanField(default = False)
+    verify_key = models.CharField(max_length=40,default ='')
     USERNAME_FIELD =    'email'
-    REQUIRED_FILEDS = []
+    REQUIRED_FILEDS = ['username']
     objects = UserManager()
     def get_full_name(self):
         return self.email
