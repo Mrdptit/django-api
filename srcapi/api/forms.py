@@ -22,8 +22,8 @@ class RegisterForm(forms.ModelForm):
             raise forms.ValidationError("Passwords don't match")
         return password2
 class UserAdminCreationForm(forms.ModelForm):
-    password1 = forms.CharField(label_suffix = "Password", widget = forms.PasswordInput)
-    password2 = forms.CharField(label_suffix = "Password comfimation", widget = forms.PasswordInput)
+    password1 = forms.CharField(label_suffix = "", widget = forms.PasswordInput)
+    password2 = forms.CharField(label_suffix = "", widget = forms.PasswordInput)
     class  Meta:
         model = User
         fields = ['email',]

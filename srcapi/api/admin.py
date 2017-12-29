@@ -5,10 +5,13 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .forms import UserAdminCreationForm, UserAdminChangeForm
 from .models import User
+from rest_framework.authtoken.admin import TokenAdmin
+
+TokenAdmin.raw_id_fields = ('user',)
 class UserAdmin(BaseUserAdmin):
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
-    list_display = ('email','admin')
+    list_display = ('id','email','admin','create_date','active',)
     list_filter = ('admin',)
     fieldsets = (
         (None, {
@@ -17,7 +20,7 @@ class UserAdmin(BaseUserAdmin):
             )
         }),
         ('Personal info',{
-            'fields':()
+            'fields':('email','avatar','cover','username','first_name','last_name','facebook_id')
         }),
         ('Permissions',{
             'fields':('admin',)
@@ -33,5 +36,4 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     filter_horizontal = ()
 admin.site.register(User,UserAdmin)
-
 admin.site.unregister(Group)

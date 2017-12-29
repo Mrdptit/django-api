@@ -1,11 +1,15 @@
 from rest_framework import serializers
-from .models import KeyWord,Value_Charater
+from .models import KeyWord,Value_Charater, User
 
 class KeyWordSerialize(serializers.ModelSerializer):
     class Meta:
         model = KeyWord
-        fields = ('id', 'key_word')
+        fields = ('__all__')
 class ValueSerialize(serializers.ModelSerializer):
     class Meta:
-        model = KeyWord
-        fields = ('id', 'key_word_id','value_key')
+        model = Value_Charater
+        fields = ('__all__')
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('__all__')
