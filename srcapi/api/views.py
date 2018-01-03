@@ -43,9 +43,8 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             print(request.data)
             id = request.data['id']
-            user = queryset.filter(id = id)
+            user= User.objects.raw("SELECT * FROM api_user WHERE id = %s",id)
             print(user)
-            return self.update(request,user)
             username = request.data('username')
             first_name = request.PUT.get('first_name')
             last_name   = request.PUT.get('last_name')

@@ -78,7 +78,7 @@ class  User(AbstractBaseUser,PermissionsMixin):
     create_date = models.DateTimeField(auto_now_add=True)
     verifyUser = models.BooleanField(default = False)
     verify_key = models.CharField(max_length=40,default ='')
-    USERNAME_FIELD =    'email'
+    USERNAME_FIELD =  'email'
     REQUIRED_FILEDS = ['username']
     objects = UserManager()
     def get_full_name(self):
