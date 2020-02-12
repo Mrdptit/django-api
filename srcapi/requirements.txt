@@ -16,7 +16,7 @@ pycodestyle==2.3.1
 Pygments==2.2.0
 PyMySQL==0.7.11
 pytz==2017.3
-requests==2.18.4
+requests==2.20.0
 South==1.0.2
 urllib3==1.22
 yapf==0.20.0
